@@ -44,7 +44,20 @@ def compute_index_of_dissimilarity(grid, subregion_grid):
     sample_count_o = np.count_nonzero(subregion_grid == 'O')
 
     index_of_dissimilarity = 0.5*abs((sample_count_x/population_count_x) - (sample_count_o/population_count_o))
-    return round(index_of_dissimilarity, 6)
+    return round(index_of_dissimilarity, 15)
+#---------------------------------------------------------------------#
+
+def get_empty_cells(grid):
+    height, width = grid.shape
+    empty_cells = []
+
+    for h in range(height):
+        for w in range(width):
+            if grid[h][w] == ' ':
+                empty_cell_position = f"({h},{w})"
+                empty_cells.append(empty_cell_position)
+
+    return empty_cells
 
 #---------------------------------------------------------------------#
 
@@ -120,6 +133,44 @@ def compute_satisfaction(similarity, sim_threshold):
 
 #---------------------------------------------------------------------#
 
+def simulate_model(grid, sim_threshold, max_iterations):
+    empty_cells  = get_empty_cells(grid)
+    agents       = get_agents(grid)
+    neighbors    = get_neighbors(grid, agents)
+    similarity   = compute_similarity(agents, neighbors)
+    satisfaction = compute_satisfaction(similarity, sim_threshold)
+
+    for iteration in range(max_iterations):
+        unsatisfied_agents = False
+        for agent_position, is_satisfied in satisfaction.items():
+            if is_satisfied == 0:
+                unsatisfied_agents = True
+                old_position = agent_position
+                new_position = np.random.choice(empty_cells)
+                agents[new_position] = agents.pop(old_position)
+                empty_cells.append(old_position)
+                empty_cells.remove(new_position)
+
+        neighbors = get_neighbors(grid, agents)
+        similarity = compute_similarity(agents, neighbors)
+        satisfaction = compute_satisfaction(similarity, sim_threshold)
+
+        if not unsatisfied_agents:
+            break
+
+    print("New Data Grid:")
+    print_model(grid)
+
+    final_unsatisfied = sum(1 for is_satisfied in satisfaction.values() if is_satisfied == 0)
+    print(f"\nNumber of unsatisfied agents: {final_unsatisfied}")
+    print("Number of iterations:", iteration + 1)
+    print(f"Maximum number of iterations: {max_iterations}")
+    print(f"Similarity Threshold: {sim_threshold}")
+
+    return
+
+#---------------------------------------------------------------------#
+
 def process_start():
     parser = get_parser()
     args   = parser.parse_args()
@@ -150,39 +201,17 @@ def process_start():
     print("\nSubregion:")
     print_model(subregion_grid)
     index_of_dissimilarity = compute_index_of_dissimilarity(grid, subregion_grid)
-    print(f"\nIndex of Dissimilarity = " + str(index_of_dissimilarity) + " or " + str(round(index_of_dissimilarity, 2)))
+    print("\nIndex of Dissimilarity = " + str(index_of_dissimilarity) + " or " + str(round(index_of_dissimilarity, 2)))
     print("DONE: Computing Index of Dissimilarity.\n")
 
     #simulation
     print("\nSTART: Simulation of Schelling Segregation.\n")
-    agents = get_agents(grid)
-    neighbors = get_neighbors(grid, agents)
-    similarity = compute_similarity(agents, neighbors)
-    satisfaction = compute_satisfaction(similarity, sim_threshold)
-    print(satisfaction)
-    print("\nDONE: Simulation of Schelling Segregation.\n")
+    simulate_model(grid, sim_threshold, max_iterations)
+    print("\n\nDONE: Simulation of Schelling Segregation.")
 
-    print("\n\nEnd Time: " + str(datetime.now()))
+    print("End Time: " + str(datetime.now()))
 
 #---------------------------------------------------------------------#
 
 if __name__ == "__main__":
     process_start()
-
-# (5) define other variables here check again the course from coursera
-
-# (1) there are
-# START: Simulation of Schelling Segregation.
-
-# X   O O
-# X           O
-#   X X     O
-#   X X    O     X
-#       X
-# X       X X
-# X X O         O   O
-# X         O O   O O
-# O       O O   O   O
-# O O   O O O O
-
-# DONE: Simulation of Schelling Segregation.
