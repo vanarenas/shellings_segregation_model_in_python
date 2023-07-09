@@ -1,3 +1,4 @@
+#LIBRARIES
 import sys
 import random
 import numpy as np
@@ -45,6 +46,7 @@ def compute_index_of_dissimilarity(grid, subregion_grid):
 
     index_of_dissimilarity = 0.5*abs((sample_count_x/population_count_x) - (sample_count_o/population_count_o))
     return round(index_of_dissimilarity, 15)
+
 #---------------------------------------------------------------------#
 
 def get_empty_cells(grid):
@@ -213,5 +215,8 @@ def process_start():
 
 #---------------------------------------------------------------------#
 
+
+
+#MAIN SCRIPT
 if __name__ == "__main__":
     process_start()
