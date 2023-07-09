@@ -153,15 +153,20 @@ def simulate_model(grid, sim_threshold, max_iterations):
                 empty_cells.append(old_position)
                 empty_cells.remove(new_position)
 
-        neighbors = get_neighbors(grid, agents)
-        similarity = compute_similarity(agents, neighbors)
+        neighbors    = get_neighbors(grid, agents)
+        similarity   = compute_similarity(agents, neighbors)
         satisfaction = compute_satisfaction(similarity, sim_threshold)
 
         if not unsatisfied_agents:
             break
 
+    new_grid = np.full_like(grid, ' ')
+    for agent_position, agent_type in agents.items():
+        row, column = map(int, agent_position.strip('()').split(','))
+        new_grid[row, column] = agent_type
+
     print("New Data Grid:")
-    print_model(grid)
+    print_model(new_grid)
 
     final_unsatisfied = sum(1 for is_satisfied in satisfaction.values() if is_satisfied == 0)
     print(f"\nNumber of unsatisfied agents: {final_unsatisfied}")
