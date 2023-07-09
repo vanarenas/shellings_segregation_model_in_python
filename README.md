@@ -69,3 +69,8 @@ This command simulates the Schelling segregation model using the `data/schelling
 
 ## Main Script
 The main script handles the execution flow of the program. It parses the command-line arguments, loads the data grid, computes the index of dissimilarity, and performs the simulation. It also prints the results and logs the output.
+
+
+## References
+Model Explanation: [Martin Hilbert's Schelling's Segregation Model Explanation](https://www.youtube.com/watch?v=AZlWOykGzYg)
+Index of Dissimilarity Calculation: [Measuring Residential Segregation Page 5](https://economics.yale.edu/sites/default/files/segregation-measures_03-24-14.pdf)
