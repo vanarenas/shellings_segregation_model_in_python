@@ -73,4 +73,5 @@ The main script handles the execution flow of the program. It parses the command
 
 ## References
 Model Explanation: [Martin Hilbert's Schelling's Segregation Model Explanation](https://www.youtube.com/watch?v=AZlWOykGzYg)
+
 Index of Dissimilarity Calculation: [Measuring Residential Segregation Page 5](https://economics.yale.edu/sites/default/files/segregation-measures_03-24-14.pdf)
