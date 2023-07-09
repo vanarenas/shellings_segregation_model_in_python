@@ -6,18 +6,13 @@ from datetime import datetime
 
 
 
-#GLOBAL VARIABLES
-
-
-
 #FUNCTION DEFINITIONS
 #---------------------------------------------------------------------#
 
 def get_parser():
     parser = ArgumentParser(description='Simulate Schellings Model of Segregation', prog='schellings_test')
     parser.add_argument('-dg',  '--data_grid', default="data/schelling.txt", help="path to the file containing the data grid")
-    parser.add_argument('-dsr', '--data_subregion', help='size of the subregion used to compute the index of dissimilarity')
-    parser.add_argument('-ssz', '--subregion_size', help='size of the subregion used to compute the index of dissimilarity')
+    parser.add_argument('-dsr', '--data_subregion', help='path to the file containing the data grid')
     parser.add_argument('-st',  '--similarity_threshold', help='Who is giving the signoff?')
     parser.add_argument('-mi',  '--max_iterations', help='Team which is giving the signoff (TS or TC)')
     return parser
@@ -41,19 +36,13 @@ def print_model(grid):
         print(" ".join(row))
 
 #---------------------------------------------------------------------#
-def compute_index_of_dissimilarity(grid, subregion_size):
-    height, width = grid.shape
-    dissimilar_count = 0
+def compute_index_of_dissimilarity(grid, subregion_grid):
+    population_count_x = np.count_nonzero(grid == 'X')
+    population_count_o = np.count_nonzero(grid == 'O')
+    sample_count_x = np.count_nonzero(subregion_grid == 'X')
+    sample_count_o = np.count_nonzero(subregion_grid == 'O')
 
-    for i in range(0, height, subregion_size):
-        for j in range(0, width, subregion_size):
-            subregion = grid[i:i + subregion_size, j:j + subregion_size]
-
-            unique_elements = np.unique(subregion)
-            if len(unique_elements) > 1:
-                dissimilar_count += 1
-
-    index_of_dissimilarity = dissimilar_count / (height * width)
+    index_of_dissimilarity = 0.5*abs((sample_count_x/population_count_x) - (sample_count_o/population_count_o))
     return round(index_of_dissimilarity, 6)
 
 #---------------------------------------------------------------------#
@@ -65,7 +54,6 @@ def process_start():
     #commandline parameters
     data_grid      = args.data_grid
     data_subregion = args.data_subregion
-    subregion_size = int(args.subregion_size)
 
     print("PYTHON IMPLEMENTATION OF SCHELLING'S MODEL OF SEGREGATION")
     print("Start Time: " + str(datetime.now()))
@@ -81,12 +69,14 @@ def process_start():
     print_model(grid)
 
     #data subregion (sample) loading and index of dissimilarity calculation
-    print("\n\nSTART: Computing Index of Dissimilarity v1")
-    print("Subregion size: " + str(subregion_size) + " x " + str(subregion_size))
-    idx_of_dissimilarity = compute_index_of_dissimilarity(grid, subregion_size)
+    print("\n\nSTART: Computing Index of Dissimilarity")
+    subregion_grid = load_grid(data_subregion)
+    print(f"Subregion size: " + str(subregion_grid.shape[0]) + " x " + str(subregion_grid.shape[1]))
     print("\nSubregion:")
-    print_model(grid[:subregion_size, :subregion_size])
-    print(f"\nIndex of Dissimilarity = " + str(idx_of_dissimilarity) + " or " + str(round(idx_of_dissimilarity, 2)))
+    print_model(subregion_grid)
+
+    index_of_dissimilarity = compute_index_of_dissimilarity(grid, subregion_grid)
+    print(f"\nIndex of Dissimilarity = " + str(index_of_dissimilarity) + " or " + str(round(index_of_dissimilarity, 2)))
     print("DONE: Computing Index of Dissimilarity.\n")
 
     #simulation
@@ -99,22 +89,6 @@ def process_start():
 
 if __name__ == "__main__":
     process_start()
-
-# START: Computing Index of Dissimilarity.
-
-# (1) check if the subregion is within the data grid
-# (2) if within the data grid then, print the subregion
-# (3) if not within the data grid, then throw an error
-# Subregion:
-# X O X O
-# O X O X
-# O X O X
-# X   X O
-
-
-# (4) if subregion is not null, then compute for index of similarity
-# Index of Dissimilarity = 0.020909 or 0.021
-# DONE: Computing Index of Dissimilarity.
 
 # (5) define other variables here check again the course from coursera
 
